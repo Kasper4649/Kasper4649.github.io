@@ -1,0 +1,45 @@
+diff --git a/node_modules/hexo-renderer-sass/lib/renderer.js b/node_modules/hexo-renderer-sass/lib/renderer.js
+index 8186677..7f98fa1 100644
+--- a/node_modules/hexo-renderer-sass/lib/renderer.js
++++ b/node_modules/hexo-renderer-sass/lib/renderer.js
+@@ -1,6 +1,7 @@
+ 'use strict'
+ 
+ const sass = require('sass')
++const path = require('path')
+ const extend = Object.assign
+ 
+ module.exports = (ext) => function (data) {
+@@ -18,12 +19,26 @@ module.exports = (ext) => function (data) {
+   }, userConfig)
+ 
+   try {
+-    // node-sass result object:
+-    // https://github.com/sass/node-sass#result-object
+-    const result = sass.renderSync(config)
+-    // result is now Buffer instead of String
+-    // https://github.com/sass/node-sass/issues/711
+-    return result.css.toString()
++    // Use modern Dart Sass API instead of legacy renderSync
++    // Get the directory of the file being compiled for load paths
++    const fileDir = path.dirname(config.file)
++    const loadPaths = [fileDir]
++    
++    // Add any user-configured load paths
++    if (userConfig.loadPaths) {
++      if (Array.isArray(userConfig.loadPaths)) {
++        loadPaths.push(...userConfig.loadPaths)
++      } else {
++        loadPaths.push(userConfig.loadPaths)
++      }
++    }
++    
++    const result = sass.compileString(config.data, {
++      loadPaths: loadPaths,
++      style: config.outputStyle || 'expanded',
++      syntax: config.indentedSyntax ? 'indented' : 'scss'
++    })
++    return result.css
+   } catch (error) {
+     console.error(error.toString())
+     throw error
