@@ -1,0 +1,3 @@
+[submodule "themes/hexo-theme-element"]
+	path = themes/hexo-theme-element
+	url = git@github.com:Kasper4649/hexo-theme-element.git
