@@ -26,6 +26,9 @@ jobs:
       - name: Build site
         run: npm run build
 
+      - name: Check build output
+        run: ls -la public/ && echo "Index.html size:" && wc -c public/index.html
+
       - name: Copy CNAME to publish directory
         run: cp CNAME public/CNAME
 
